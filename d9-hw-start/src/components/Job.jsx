@@ -1,21 +1,13 @@
-import { Row, Col, Button } from 'react-bootstrap'
+import { Row, Col } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
-import { addToFavourites, removeFromFavourites } from '../components/Actions'
+import { Star, StarFill } from 'react-bootstrap-icons'
+import { useSelector, useDispatch } from 'react-redux'
 
 const Job = ({ data }) => {
+  const favourites = useSelector((state) => state.favourite.list)
   const dispatch = useDispatch()
-  const favourites = useSelector((state) => state.main.favourites)
 
-  const isFavourite = favourites.includes(data.company_name)
-
-  const handleFavouriteClick = () => {
-    if (isFavourite) {
-      dispatch(removeFromFavourites(data.company_name))
-    } else {
-      dispatch(addToFavourites(data.company_name))
-    }
-  }
+  const isFav = favourites.includes(data.company_name)
 
   return (
     <Row
@@ -23,20 +15,37 @@ const Job = ({ data }) => {
       style={{ border: '1px solid #00000033', borderRadius: 4 }}
     >
       <Col xs={3}>
+        {isFav ? (
+          <StarFill
+            color="gold"
+            size={16}
+            className="mr-2 my-auto"
+            onClick={() =>
+              dispatch({
+                type: 'REMOVE_FROM_FAVOURITE',
+                payload: data.company_name,
+              })
+            }
+          />
+        ) : (
+          <Star
+            color="gold"
+            size={16}
+            className="mr-2 my-auto"
+            onClick={() =>
+              dispatch({
+                type: 'ADD_TO_FAVOURITE',
+                payload: data.company_name,
+              })
+            }
+          />
+        )}
         <Link to={`/${data.company_name}`}>{data.company_name}</Link>
       </Col>
-      <Col xs={6}>
+      <Col xs={9}>
         <a href={data.url} target="_blank" rel="noreferrer">
           {data.title}
         </a>
-      </Col>
-      <Col xs={3} className="text-end">
-        <Button
-          variant={isFavourite ? 'danger' : 'success'}
-          onClick={handleFavouriteClick}
-        >
-          {isFavourite ? 'Remove' : 'Add to Favourites'}
-        </Button>
       </Col>
     </Row>
   )
